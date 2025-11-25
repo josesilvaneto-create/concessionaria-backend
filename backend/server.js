@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 10000;
 // Configuração do CORS CORRIGIDA
 const corsOptions = {
     origin: [
-        'https://concessionaria-frontend2.vercel.app',
         'https://concessionaria-frontend.vercel.app',
         'http://localhost:3000',
         'http://127.0.0.1:3000'
@@ -42,3 +41,4 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
     console.log(`🌐 CORS configurado para: ${corsOptions.origin.join(', ')}`);
 });
+
