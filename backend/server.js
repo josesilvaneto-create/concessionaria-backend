@@ -16,8 +16,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Aumentar limite para upload de imagens
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rotas da API
 app.use('/api/auth', authRoutes);
@@ -105,3 +106,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
