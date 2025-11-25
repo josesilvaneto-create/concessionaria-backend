@@ -4,6 +4,103 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
+// Listar todos os veículos com imagens
+router.get('/', async (req, res) => {
+    try {
+        const { data: veiculos, error } = await supabase
+            .from('veiculos')
+            .select('*')
+            .eq('disponivel', true)
+            .order('criado_em', { ascending: false });
+
+        if (error) {
+            console.error('Erro ao buscar veículos:', error);
+            return res.status(500).json({ error: 'Erro ao buscar veículos' });
+        }
+
+        // Adicionar URLs das imagens para cada veículo
+        const veiculosComImagens = await Promise.all(
+            veiculos.map(async (veiculo) => {
+                const { data: imagens } = await supabase
+                    .storage
+                    .from('veiculos-imagens')
+                    .list(`veiculo-${veiculo.id}`);
+
+                const imagensComUrl = imagens?.map(imagem => {
+                    const { data: url } = supabase
+                        .storage
+                        .from('veiculos-imagens')
+                        .getPublicUrl(`veiculo-${veiculo.id}/${imagem.name}`);
+                    
+                    return url.publicUrl;
+                }) || [];
+
+                return {
+                    ...veiculo,
+                    imagens: imagensComUrl,
+                    imagem_principal: imagensComUrl[0] || '/images/car-placeholder.png'
+                };
+            })
+        );
+
+        res.json({ veiculos: veiculosComImagens });
+    } catch (error) {
+        console.error('Erro ao listar veículos:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+});
+
+// Upload de imagem para veículo
+router.post('/:id/imagens', authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { imagem } = req.body; // Base64 da imagem
+
+        if (!imagem) {
+            return res.status(400).json({ error: 'Imagem é obrigatória' });
+        }
+
+        // Converter base64 para buffer
+        const base64Data = imagem.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        // Nome único para a imagem
+        const nomeArquivo = `imagem-${Date.now()}.jpg`;
+        const caminho = `veiculo-${id}/${nomeArquivo}`;
+
+        // Upload para o Supabase Storage
+        const { error: uploadError } = await supabase
+            .storage
+            .from('veiculos-imagens')
+            .upload(caminho, buffer, {
+                contentType: 'image/jpeg',
+                upsert: false
+            });
+
+        if (uploadError) {
+            console.error('Erro no upload:', uploadError);
+            return res.status(500).json({ error: 'Erro ao fazer upload da imagem' });
+        }
+
+        // Obter URL pública
+        const { data: urlData } = supabase
+            .storage
+            .from('veiculos-imagens')
+            .getPublicUrl(caminho);
+
+        res.json({ 
+            success: true, 
+            url: urlData.publicUrl,
+            message: 'Imagem adicionada com sucesso' 
+        });
+
+    } catch (error) {
+        console.error('Erro no upload de imagem:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+});
+
+
 // Listar todos os veículos (público)
 router.get('/', async (req, res) => {
     try {
@@ -186,5 +283,6 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
+
 
 module.exports = router;
