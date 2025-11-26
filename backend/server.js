@@ -1,108 +1,65 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-
 const authRoutes = require('./routes/auth');
 const veiculosRoutes = require('./routes/veiculos');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
-// CORS UNIVERSAL - Aceita qualquer origem
-app.use(cors({
-    origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Prefer']
-}));
+app.use(cors());
+app.use(express.json());
 
-// Aumentar limite para upload de imagens
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Rotas da API
+// Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/veiculos', veiculosRoutes);
 
-// Rota de health check
+// Rota health check
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        message: 'Servidor da concessionária funcionando',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
-    });
+  res.json({ 
+    success: true, 
+    message: 'API está funcionando',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Rota raiz - resposta mais completa
+// Rota raiz
 app.get('/', (req, res) => {
-    res.json({ 
-        success: true,
-        message: '🚀 API da Concessionária AutoPremium - ONLINE',
-        version: '1.0.0',
-        timestamp: new Date().toISOString(),
-        endpoints: {
-            docs: '/api/health',
-            auth: '/api/auth',
-            veiculos: '/api/veiculos'
-        },
-        status: {
-            server: 'online',
-            database: 'connected',
-            environment: process.env.NODE_ENV || 'development'
-        }
-    });
+  res.json({ 
+    success: true, 
+    message: 'Bem-vindo à API da Concessionária',
+    version: '1.0.0'
+  });
 });
 
-// Rota da API raiz
+// Rota para listar endpoints
 app.get('/api', (req, res) => {
-    res.json({ 
-        message: 'API AutoPremium - Endpoints disponíveis',
-        endpoints: {
-            health: '/api/health',
-            auth: {
-                register: 'POST /api/auth/register',
-                login: 'POST /api/auth/login',
-                logout: 'POST /api/auth/logout',
-                me: 'GET /api/auth/me'
-            },
-            veiculos: {
-                list: 'GET /api/veiculos',
-                get: 'GET /api/veiculos/:id',
-                create: 'POST /api/veiculos',
-                update: 'PUT /api/veiculos/:id',
-                delete: 'DELETE /api/veiculos/:id'
-            }
-        }
-    });
+  res.json({
+    success: true,
+    endpoints: {
+      auth: '/api/auth',
+      veiculos: '/api/veiculos', 
+      health: '/api/health'
+    }
+  });
 });
 
-// Middleware de tratamento de erros
-app.use((error, req, res, next) => {
-    console.error('❌ Erro no servidor:', error);
-    res.status(500).json({ 
-        success: false,
-        error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? error.message : 'Algo deu errado'
-    });
-});
-
-// Rota não encontrada
+// Middleware de erro 404
 app.use('*', (req, res) => {
-    res.status(404).json({ 
-        success: false,
-        error: 'Rota não encontrada',
-        path: req.originalUrl,
-        available_endpoints: ['/', '/api', '/api/health', '/api/veiculos', '/api/auth']
-    });
+  res.status(404).json({
+    success: false,
+    error: 'Rota não encontrada',
+    path: req.originalUrl,
+    available_endpoints: [
+      '/',
+      '/api', 
+      '/api/health',
+      '/api/veiculos',
+      '/api/auth'
+    ]
+  });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`📊 Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`🔗 URL do Render: https://concessionaria-backend-5.onrender.com`);
-    console.log(`✅ Backend pronto para receber requisições!`);
+// Inicialização do servidor
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
-
-module.exports = app;
-
