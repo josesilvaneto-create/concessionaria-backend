@@ -10,9 +10,10 @@ const PORT = process.env.PORT || 10000;
 
 // CORS UNIVERSAL - Aceita qualquer origem
 app.use(cors({
-    origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Prefer']
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Aumentar limite para upload de imagens
@@ -22,7 +23,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/veiculos', veiculosRoutes);
-app.use('/api/veiculo_fotos', veiculoFotosRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
@@ -106,4 +106,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
