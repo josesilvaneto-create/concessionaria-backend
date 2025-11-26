@@ -9,15 +9,11 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // CORS UNIVERSAL - Aceita qualquer origem
-const cors = require('cors');
-
-const corsOptions = {
+app.use(cors({
     origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Prefer']
-};
-
-module.exports = cors(corsOptions);
+}));
 
 // Aumentar limite para upload de imagens
 app.use(express.json({ limit: '10mb' }));
@@ -26,6 +22,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/veiculos', veiculosRoutes);
+app.use('/api/veiculo_fotos', veiculoFotosRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
@@ -104,7 +101,7 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
     console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📊 Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`🔗 URL do Render: https://concessionaria-backend-1.onrender.com`);
+    console.log(`🔗 URL do Render: https://concessionaria-backend-5.onrender.com`);
     console.log(`✅ Backend pronto para receber requisições!`);
 });
 
