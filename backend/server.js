@@ -22,6 +22,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/veiculos', veiculosRoutes);
+app.use('/api/veiculo_fotos', veiculoFotosRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
@@ -105,5 +106,6 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
