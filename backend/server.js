@@ -13,7 +13,7 @@ console.log('✅ Supabase client inicializado');
 
 // CORS
 app.use(cors({
-    origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000'],
+    origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000', 'https://concessionaria-frontend.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Prefer']
 }));
@@ -190,3 +190,4 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`🚗 Backend concessionária rodando na porta ${PORT}`);
 });
+
