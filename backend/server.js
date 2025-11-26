@@ -101,7 +101,7 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
     console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📊 Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`🔗 URL do Render: https://concessionaria-backend-5.onrender.com`);
+    console.log(`🔗 URL do Render: https://concessionaria-backend-1.onrender.com`);
     console.log(`✅ Backend pronto para receber requisições!`);
 });
 
