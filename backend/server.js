@@ -10,10 +10,9 @@ const PORT = process.env.PORT || 10000;
 
 // CORS UNIVERSAL - Aceita qualquer origem
 app.use(cors({
-    origin: true,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: ['https://concessionaria-frontend.vercel.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Prefer']
 }));
 
 // Aumentar limite para upload de imagens
@@ -106,4 +105,5 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
